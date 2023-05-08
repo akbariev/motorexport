@@ -1,0 +1,22 @@
+db:
+  url: postgresql://127.0.0.1:5433/postgres
+  username: postgres
+  password: postgres
+
+spring:
+  # Database configuration
+  r2dbc:
+    url: "r2dbc:${db.url}"
+    username: ${db.username}
+    password: ${db.password}
+    user: postgres
+  # Flyway configuration
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: public
+    url: "jdbc:${db.url}"
+    username: ${db.username}
+    password: ${db.password}
+    user: postgres
+
