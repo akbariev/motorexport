@@ -25,18 +25,30 @@ CREATE TYPE in_stock AS ENUM (
     );
 
 
-CREATE TABLE IF NOT EXISTS car(
-    id              UUID        DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS car
+(
+    id              UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
     engine_group    engine_group                          NOT NULL,
     gear_type       gear_type                             NOT NULL,
     transmission    transmission                          NOT NULL,
     body_type_group body_type_group                       NOT NULL,
-    in_stock         in_stock                              NOT NULL,
+    in_stock        in_stock                              NOT NULL,
     year            BIGINT,
     price           BIGINT,
     mileage         BIGINT,
     displacement    BIGINT,
     country         VARCHAR(3),
+    make            TEXT,
+    model           TEXT,
     created_at      TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at      TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS car_image
+(
+    id     UUID DEFAULT gen_random_uuid(),
+    path   TEXT,
+    car_id UUID,
+
+    CONSTRAINT fk_car FOREIGN KEY (car_id) REFERENCES car (id) ON DELETE CASCADE
 );

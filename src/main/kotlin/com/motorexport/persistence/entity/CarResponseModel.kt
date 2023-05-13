@@ -8,12 +8,8 @@ import com.motorexport.controller.dto.Transmission
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
-import org.springframework.data.annotation.Id
-import org.springframework.data.relational.core.mapping.Table
 
-@Table("car")
-data class CarEntity(
-    @Id
+data class CarResponseModel(
     val id: UUID? = null,
     val engineGroup: EngineGroup,
     val gearType: GearType,
@@ -25,8 +21,8 @@ data class CarEntity(
     val mileage: Long,
     val displacement: Int,
     val country: String,
-    val make: String,
-    val model: String,
+    val imagePaths: List<String>? = null,
     val createdAt: Instant = Instant.now(),
     val updatedAt: Instant = Instant.now(),
 )
+

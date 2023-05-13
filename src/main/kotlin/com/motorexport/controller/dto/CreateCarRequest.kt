@@ -1,6 +1,8 @@
 package com.motorexport.controller.dto
 
 data class CreateCarRequest(
+    val make: String,
+    val model: String,
     val engineGroup: EngineGroup,
     val gearType: GearType,
     val transmission: Transmission,
@@ -11,6 +13,7 @@ data class CreateCarRequest(
     val mileage: Long,
     val displacement: Int,
     val country: String,
+    val secretKey: String?,
 )
 
 
