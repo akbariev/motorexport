@@ -6,18 +6,18 @@ import com.motorexport.persistence.CarImagesRepository
 import com.motorexport.persistence.CarRepository
 import com.motorexport.persistence.entity.CarEntity
 import com.motorexport.persistence.entity.CarImageEntity
-import com.motorexport.persistence.entity.CarResponseModel
+import com.motorexport.persistence.entity.CarModel
+import com.motorexport.persistence.entity.CarsResponse
 import java.math.BigDecimal
 import java.nio.file.Paths
 import java.util.UUID
+import kotlin.math.ceil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.withContext
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -32,13 +32,13 @@ class CarService(
         const val IMAGE_FOLDER_PATH = "images/" //creates folder on src level
     }
 
-    suspend fun getCar(id: String): CarResponseModel? {
+    suspend fun getCar(id: String): CarModel? {
         return carRepository.findById(UUID.fromString(id))?.let {
             it.id ?: error("not car id present")
             val carImages = carImagesRepository.findAllByCarId(it.id)
             val imagePaths = mutableListOf<String>()
             carImages.forEach { image -> imagePaths.add(image.path) }
-            CarResponseModel(
+            CarModel(
                 id = it.id,
                 engineGroup = it.engineGroup,
                 gearType = it.gearType,
@@ -57,9 +57,11 @@ class CarService(
         }
     }
 
-    suspend fun getCars(carRequest: CarListRequest): List<CarResponseModel> {
-        val page = PageRequest.of(carRequest.page, carRequest.size)
-        return carRepository.findAllByFilter(carRequest, page, Sort.by(Sort.Direction.DESC, "updated_at"))
+    suspend fun getCars(carRequest: CarListRequest): CarsResponse {
+        val cars =  carRepository.findAllByFilter(carRequest)
+        val carsSize = carRepository.countAllByFilter(carRequest)
+        val totalPages = if(carsSize > 0) ceil(carsSize / carRequest.size.toDouble()).toLong() else 0
+        return CarsResponse(cars, totalPages)
     }
 
     @Transactional

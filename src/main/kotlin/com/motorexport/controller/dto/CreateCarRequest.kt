@@ -7,7 +7,7 @@ data class CreateCarRequest(
     val gearType: GearType,
     val transmission: Transmission,
     val bodyTypeGroup: BodyTypeGroup,
-    val inStock: InStock,
+    val inStock: InStock = InStock.IN_STOCK,
     val year: Long,
     val price: Long,
     val mileage: Long,

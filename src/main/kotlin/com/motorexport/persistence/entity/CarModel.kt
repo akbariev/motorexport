@@ -9,7 +9,7 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
 
-data class CarResponseModel(
+data class CarModel(
     val id: UUID? = null,
     val engineGroup: EngineGroup,
     val gearType: GearType,
@@ -22,6 +22,7 @@ data class CarResponseModel(
     val displacement: Int,
     val country: String,
     val imagePaths: List<String>? = null,
+    val fullCount: Int? = null,
     val createdAt: Instant = Instant.now(),
     val updatedAt: Instant = Instant.now(),
 )
