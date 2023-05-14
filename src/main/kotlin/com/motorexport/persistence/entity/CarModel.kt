@@ -22,7 +22,6 @@ data class CarModel(
     val displacement: Int,
     val country: String,
     val imagePaths: List<String>? = null,
-    val fullCount: Int? = null,
     val createdAt: Instant = Instant.now(),
     val updatedAt: Instant = Instant.now(),
 )
