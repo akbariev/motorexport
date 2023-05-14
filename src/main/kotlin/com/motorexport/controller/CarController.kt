@@ -6,6 +6,7 @@ import com.motorexport.persistence.entity.CarModel
 import com.motorexport.persistence.entity.CarsResponse
 import com.motorexport.service.CarService
 import java.util.UUID
+import javax.validation.Valid
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.multipart.FilePart
@@ -37,7 +38,7 @@ class CarController(
 
     @PostMapping("/create", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE])
     suspend fun createCar(
-        @ModelAttribute @Validated request: CreateCarRequest,
+        @ModelAttribute @Valid request: CreateCarRequest,
         // todo необходимо переделать на flow. но приходит ошибка
         //  org.springframework.web.server.UnsupportedMediaTypeStatusException: 415 UNSUPPORTED_MEDIA_TYPE "Content type 'image/png' not supported for bodyType=org.springframework.http.codec.multipart.FilePart", message is = 415 UNSUPPORTED_MEDIA_TYPE "Content type 'image/png' not supported for bodyType=org.springframework.http.codec.multipart.FilePart"
         //  По хорошему узнать больше за реактивное программирование + корутины

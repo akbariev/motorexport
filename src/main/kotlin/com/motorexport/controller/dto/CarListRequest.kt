@@ -11,24 +11,24 @@ data class CarListRequest(
     val transmission: Transmission? = null,
     val bodyTypeGroup: BodyTypeGroup? = null,
     val inStock: InStock? = null,
-    @Min(value = 1890)
+    @field:Max(value = 3)
     val country: String? = null,
-    @Min(value = 1890)
+    @field:Min(value = 1890)
     val yearFrom: Long? = null,
-    @Min(value = 1890)
+    @field:Min(value = 1890)
     val yearTo: Int? = null,
-    @Positive
+    @field:Positive
     val priceFrom: Long? = null,
-    @Positive
+    @field:Positive
     val priceTo: Long? = null,
-    @PositiveOrZero
+    @field:PositiveOrZero
     val mileageFrom: Long? = null,
-    @Max(99999999)
+    @field:Max(99999999)
     val mileageTo: Long? = null,
     val displacementFrom: Long? = null,
     val displacementTo: Long? = null,
-    @PositiveOrZero
+    @field:PositiveOrZero
     val page: Int,
-    @Positive
+    @field:Positive
     val size: Int,
 )
