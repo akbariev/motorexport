@@ -1,9 +1,9 @@
 package com.motorexport.controller.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import javax.validation.constraints.Max
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Positive
+import javax.validation.constraints.Size
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class CreateCarRequest(
@@ -24,8 +24,8 @@ data class CreateCarRequest(
     val mileage: Long,
     @field:Positive
     val displacement: Int,
-    @field:Positive
-    @field:Max(3)
+    @Size(min = 2, message = "{validation.name.size.too_short}")
+    @Size(max = 3, message = "{validation.name.size.too_long}")
     val country: String,
     val secretKey: String?,
 )
