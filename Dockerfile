@@ -1,7 +1,7 @@
 FROM gradle:7.6.1-jdk11 as builder
 WORKDIR /app
 COPY src ./src
-COPY build.gradle.kts ./build.gradle.kts
+COPY pom.xml ./pom.xml
 RUN gradle assemble
 
 FROM openjdk:11 as backend
