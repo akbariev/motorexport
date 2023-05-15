@@ -23,7 +23,7 @@ data class CarModel(
     val mileage: Long,
     val displacement: Int,
     val country: String,
-    val images: List<CarImageModel>? = null,
+    val imagePaths: List<String>? = null,
     val createdAt: Instant = Instant.now(),
     val updatedAt: Instant = Instant.now(),
 )

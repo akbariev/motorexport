@@ -1,10 +1,7 @@
 package com.motorexport.controller.dto
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import java.util.UUID
 import javax.validation.constraints.Max
-import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Positive
 
 data class UpdateCarRequest(
@@ -27,7 +24,7 @@ data class UpdateCarRequest(
     @field:Max(3)
     val country: String? = null,
     val secretKey: String,
-    val carImageIdsToBeDeleted: List<UUID> = listOf(),
+    val carImagePathsToBeDeleted: List<String> = listOf(),
 )
 
 

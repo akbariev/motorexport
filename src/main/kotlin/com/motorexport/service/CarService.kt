@@ -7,7 +7,6 @@ import com.motorexport.persistence.CarImagesRepository
 import com.motorexport.persistence.CarRepository
 import com.motorexport.persistence.entity.CarEntity
 import com.motorexport.persistence.entity.CarImageEntity
-import com.motorexport.persistence.entity.CarImageModel
 import com.motorexport.persistence.entity.CarModel
 import com.motorexport.persistence.entity.CarsResponse
 import java.math.BigDecimal
@@ -40,8 +39,8 @@ class CarService(
         return carRepository.findById(UUID.fromString(id))?.let {
             it.id ?: error("not car id present")
             val carImages = carImagesRepository.findAllByCarId(it.id)
-            val images = mutableListOf<CarImageModel>()
-            carImages.forEach { image -> images.add(CarImageModel(image.id,image.path)) }
+            val images = mutableListOf<String>()
+            carImages.forEach { image -> images.add(image.path) }
             CarModel(
                 id = it.id,
                 engineGroup = it.engineGroup,
@@ -54,7 +53,7 @@ class CarService(
                 mileage = it.mileage,
                 displacement = it.displacement,
                 country = it.country,
-                images = images,
+                imagePaths = images,
                 make = it.make,
                 model = it.model,
                 createdAt = it.createdAt,
@@ -131,15 +130,15 @@ class CarService(
 
         val carId = carRepository.save(updatedCarEntity).id ?: error("no car id present")
 
-        val carImageIdsByEntities = carImagesRepository.findAllByCarId(request.carId).associateBy { it.id }
+        val carImageIdsByEntities = carImagesRepository.findAllByCarId(request.carId).associateBy { it.path }
 
-        val finalCarImagePathsToBeDeleted = mutableListOf<UUID>()
-        request.carImageIdsToBeDeleted.forEach {
+        val finalCarImagePathsToBeDeleted = mutableListOf<String>()
+        request.carImagePathsToBeDeleted.forEach {
             if(carImageIdsByEntities.contains(it)) {
                 finalCarImagePathsToBeDeleted.add(it)
             }
         }
-        finalCarImagePathsToBeDeleted.takeIf { it.size > 0 }?.let { carImagesRepository.deleteAllById(finalCarImagePathsToBeDeleted) }
+        finalCarImagePathsToBeDeleted.takeIf { it.size > 0 }?.let { carImagesRepository.deleteAllByPathIn(finalCarImagePathsToBeDeleted) }
         val allowedMaxCarImagesSize = MAX_ALLOWED_IMAGES_SIZE - (carImageIdsByEntities.size - finalCarImagePathsToBeDeleted.size)
 
         // и сверяем с новым числом картинок, берем то количество картинок, чтобы в сумме не привышало 5 картинок.

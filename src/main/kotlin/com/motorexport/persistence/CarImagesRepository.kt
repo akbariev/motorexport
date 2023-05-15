@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository
 interface CarImagesRepository : CoroutineCrudRepository<CarImageEntity, UUID> {
 
     suspend fun findAllByCarId(carId: UUID): List<CarImageEntity>
+    suspend fun deleteAllByPathIn(path: List<String>): Long
 }
