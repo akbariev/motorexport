@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.bind.support.WebExchangeBindException
 
 
 @RestControllerAdvice
@@ -19,7 +20,7 @@ class WebExceptionHandler {
     @ExceptionHandler(value = [(Exception::class)])
     fun internalServerError(ex: Exception): ResponseEntity<String> {
         logger.error("$ex, message is = ${ex.message}")
-        return ResponseEntity("message is = ${ex.message}", HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity("${ex.message}", HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
     @ExceptionHandler(value = [(AccessDeniedException::class)])
@@ -38,4 +39,20 @@ class WebExceptionHandler {
         })
         return errors
     }
+
+    @ExceptionHandler(WebExchangeBindException::class)
+    fun handleBindException(ex: WebExchangeBindException): ResponseEntity<ErrorResponse> {
+        val errors = ex.bindingResult.allErrors.map {
+            when (it) {
+                is FieldError -> "${it.field}: ${it.defaultMessage}"
+                is ObjectError -> it.defaultMessage
+                else -> "Unknown error"
+            }
+        }
+        val errorMessage = "Validation failed: ${errors.joinToString(", ")}"
+        val errorResponse = ErrorResponse(errorMessage)
+        return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
+    }
 }
+
+data class ErrorResponse(val message: String)

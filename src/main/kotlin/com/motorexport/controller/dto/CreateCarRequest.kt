@@ -1,9 +1,11 @@
 package com.motorexport.controller.dto
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import javax.validation.constraints.Max
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Positive
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class CreateCarRequest(
     @field:NotBlank
     val make: String,

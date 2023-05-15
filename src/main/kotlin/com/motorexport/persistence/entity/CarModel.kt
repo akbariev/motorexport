@@ -11,6 +11,8 @@ import java.util.UUID
 
 data class CarModel(
     val id: UUID? = null,
+    val make: String,
+    val model: String,
     val engineGroup: EngineGroup,
     val gearType: GearType,
     val transmission: Transmission,
@@ -21,7 +23,7 @@ data class CarModel(
     val mileage: Long,
     val displacement: Int,
     val country: String,
-    val imagePaths: List<String>? = null,
+    val images: List<CarImageModel>? = null,
     val createdAt: Instant = Instant.now(),
     val updatedAt: Instant = Instant.now(),
 )

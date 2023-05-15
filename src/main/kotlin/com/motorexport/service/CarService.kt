@@ -2,10 +2,12 @@ package com.motorexport.service
 
 import com.motorexport.controller.dto.CarListRequest
 import com.motorexport.controller.dto.CreateCarRequest
+import com.motorexport.controller.dto.UpdateCarRequest
 import com.motorexport.persistence.CarImagesRepository
 import com.motorexport.persistence.CarRepository
 import com.motorexport.persistence.entity.CarEntity
 import com.motorexport.persistence.entity.CarImageEntity
+import com.motorexport.persistence.entity.CarImageModel
 import com.motorexport.persistence.entity.CarModel
 import com.motorexport.persistence.entity.CarsResponse
 import java.math.BigDecimal
@@ -23,6 +25,8 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 
+private const val MAX_ALLOWED_IMAGES_SIZE = 5
+
 @Service
 class CarService(
     val carRepository: CarRepository,
@@ -36,8 +40,8 @@ class CarService(
         return carRepository.findById(UUID.fromString(id))?.let {
             it.id ?: error("not car id present")
             val carImages = carImagesRepository.findAllByCarId(it.id)
-            val imagePaths = mutableListOf<String>()
-            carImages.forEach { image -> imagePaths.add(image.path) }
+            val images = mutableListOf<CarImageModel>()
+            carImages.forEach { image -> images.add(CarImageModel(image.id,image.path)) }
             CarModel(
                 id = it.id,
                 engineGroup = it.engineGroup,
@@ -50,7 +54,9 @@ class CarService(
                 mileage = it.mileage,
                 displacement = it.displacement,
                 country = it.country,
-                imagePaths = imagePaths,
+                images = images,
+                make = it.make,
+                model = it.model,
                 createdAt = it.createdAt,
                 updatedAt = it.updatedAt,
             )
@@ -100,6 +106,62 @@ class CarService(
         }.collectList().awaitFirstOrNull()
 
         carImagesRepository.saveAll(carImagesItems).collect()
+        return carId
+    }
+
+
+    @Transactional
+    suspend fun updateCar(request: UpdateCarRequest, images: Flux<FilePart>?): UUID {
+        if (request.secretKey != "export2023") error("Incorrect secret")
+        val carEntity = carRepository.findById(request.carId)?: error("no car present by id ${request.carId}")
+        val updatedCarEntity = carEntity.copy(
+            engineGroup = request.engineGroup?: carEntity.engineGroup,
+                    gearType = request.gearType?: carEntity.gearType,
+                    transmission = request.transmission?: carEntity.transmission,
+                    bodyTypeGroup = request.bodyTypeGroup?: carEntity.bodyTypeGroup,
+                    inStock = request.inStock?: carEntity.inStock,
+                    year = request.year?: carEntity.year,
+                    price = request.price?.toBigDecimal()?: carEntity.price,
+                    mileage = request.mileage?: carEntity.mileage,
+                    displacement = request.displacement?: carEntity.displacement,
+                    country = request.country?: carEntity.country,
+                    make = request.make?: carEntity.make,
+                    model = request.model?: carEntity.model,
+        )
+
+        val carId = carRepository.save(updatedCarEntity).id ?: error("no car id present")
+
+        val carImageIdsByEntities = carImagesRepository.findAllByCarId(request.carId).associateBy { it.id }
+
+        val finalCarImagePathsToBeDeleted = mutableListOf<UUID>()
+        request.carImageIdsToBeDeleted.forEach {
+            if(carImageIdsByEntities.contains(it)) {
+                finalCarImagePathsToBeDeleted.add(it)
+            }
+        }
+        finalCarImagePathsToBeDeleted.takeIf { it.size > 0 }?.let { carImagesRepository.deleteAllById(finalCarImagePathsToBeDeleted) }
+        val allowedMaxCarImagesSize = MAX_ALLOWED_IMAGES_SIZE - (carImageIdsByEntities.size - finalCarImagePathsToBeDeleted.size)
+
+        // и сверяем с новым числом картинок, берем то количество картинок, чтобы в сумме не привышало 5 картинок.
+
+        // сохраняем новые картинки.
+        val carImagesItems = mutableListOf<CarImageEntity>()
+        // Collect the files and save them to the directory
+        images?.take(allowedMaxCarImagesSize.toLong())?.map { filePart ->
+            val imageId = UUID.randomUUID()
+            val imagePath = IMAGE_FOLDER_PATH + imageId.toString() + filePart.filename()
+            val file = Paths.get(imagePath)
+
+            // Write the file to disk
+            GlobalScope.launch(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
+                    filePart.transferTo(file).awaitFirstOrNull()
+                }
+            }
+            carImagesItems.add(CarImageEntity(id = imageId, path = imagePath, carId = carId))
+        }?.collectList()?.awaitFirstOrNull()?.also {
+            carImagesRepository.saveAll(carImagesItems).collect()
+        }
         return carId
     }
 

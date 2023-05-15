@@ -1,10 +1,12 @@
 package com.motorexport.controller.dto
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 import javax.validation.constraints.Positive
 import javax.validation.constraints.PositiveOrZero
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class CarListRequest(
     val engineGroup: EngineGroup? = null,
     val gearType: GearType? = null,

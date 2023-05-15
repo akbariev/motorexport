@@ -8,7 +8,9 @@ import com.motorexport.controller.dto.Transmission
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.UUID
+import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.relational.core.mapping.Table
 
 @Table("car")
@@ -27,6 +29,8 @@ data class CarEntity(
     val country: String,
     val make: String,
     val model: String,
+    @CreatedDate
     val createdAt: Instant = Instant.now(),
+    @LastModifiedDate
     val updatedAt: Instant = Instant.now(),
 )
