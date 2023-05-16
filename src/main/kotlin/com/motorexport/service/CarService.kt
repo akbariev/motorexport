@@ -10,6 +10,7 @@ import com.motorexport.persistence.entity.CarImageEntity
 import com.motorexport.persistence.entity.CarModel
 import com.motorexport.persistence.entity.CarsResponse
 import java.math.BigDecimal
+import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.UUID
 import kotlin.math.ceil
@@ -92,12 +93,14 @@ class CarService(
         // Collect the files and save them to the directory
         images.map { filePart ->
             val imageId = UUID.randomUUID()
-            val imagePath = IMAGE_FOLDER_PATH + imageId.toString() + filePart.filename()
+            val carImagesFolder = IMAGE_FOLDER_PATH + carId
+            val imagePath = carImagesFolder + "/" + imageId.toString() + filePart.filename()
             val file = Paths.get(imagePath)
 
             // Write the file to disk
             GlobalScope.launch(Dispatchers.IO) {
                 withContext(Dispatchers.IO) {
+                    Files.createDirectories(Paths.get(carImagesFolder))
                     filePart.transferTo(file).awaitFirstOrNull()
                 }
             }
