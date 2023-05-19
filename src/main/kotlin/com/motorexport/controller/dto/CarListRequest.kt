@@ -5,6 +5,7 @@ import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 import javax.validation.constraints.Positive
 import javax.validation.constraints.PositiveOrZero
+import javax.validation.constraints.Size
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class CarListRequest(
@@ -13,7 +14,8 @@ data class CarListRequest(
     val transmission: Transmission? = null,
     val bodyTypeGroup: BodyTypeGroup? = null,
     val inStock: InStock? = null,
-    @field:Max(value = 3)
+    @Size(min = 2, message = "{validation.name.size.too_short}")
+    @Size(max = 3, message = "{validation.name.size.too_long}")
     val country: String? = null,
     @field:Min(value = 1890)
     val yearFrom: Long? = null,
