@@ -1,13 +1,26 @@
-FROM gradle:7.6.1-jdk11 as builder
-WORKDIR /app
-COPY src ./src
-COPY pom.xml ./pom.xml
-RUN gradle assemble
+# Use a base image with Java 11 and Maven installed
+FROM adoptopenjdk:11-jdk-hotspot AS build
 
-FROM openjdk:11 as backend
+RUN apt-get update && \
+    apt-get install -y maven
+# Set the working directory
+WORKDIR /app
+# Copy the source code
+COPY src ./src
+
+# Copy the pom.xml file
+COPY pom.xml ./pom.xml
+
+# Build the application
+RUN mvn clean package -DskipTests
+
+# Create the final image
+FROM adoptopenjdk:11-jre-hotspot
+# Set the working directory
 WORKDIR /root
-RUN mkdir images
 ENV TZ Europe/Moscow
-COPY --from=builder /app/build/libs/*.jar app.jar
+# Copy the JAR file from the build stage
+COPY --from=build /app/target/*.jar motorexport.jar
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","app.jar"]
+# Set the entrypoint command
+ENTRYPOINT ["java", "-jar", "motorexport.jar"]

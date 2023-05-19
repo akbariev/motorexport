@@ -6,17 +6,18 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.7.0</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <!--<relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
     </parent>
-    <groupId>com.example</groupId>
+    <groupId>com</groupId>
     <artifactId>motorexport</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>motorexport</name>
-    <description>motorexport</description>
+
     <properties>
-        <java.version>17</java.version>
+        <java.version>11</java.version>
         <kotlin.version>1.7.22</kotlin.version>
         <springdoc.version>1.6.14</springdoc.version>
+        <spring-boot.version>2.7.0</spring-boot.version>
     </properties>
     <dependencies>
         <dependency>
@@ -26,6 +27,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-r2dbc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -47,20 +52,10 @@
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <artifactId>kotlin-stdlib</artifactId>
         </dependency>
 
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-r2dbc</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>r2dbc-postgresql</artifactId>
@@ -81,7 +76,13 @@
             <scope>runtime</scope>
         </dependency>
 
-<!--Jackson Object mapper-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--Jackson Object mapper-->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
@@ -108,24 +109,35 @@
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-coroutines-core</artifactId>
-            <version>1.6.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-reactive -->
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-coroutines-reactive</artifactId>
-            <version>1.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-coroutines-reactor</artifactId>
-            <version>1.6.0</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <configuration>
+                    <layers>
+                        <enabled>true</enabled>
+                    </layers>
+                    <mainClass>com.motorexport.MotorexportApplicationKt</mainClass>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
@@ -138,7 +150,7 @@
                         </goals>
                         <configuration>
                             <sourceDirs>
-                                <source>${project.basedir}src/main/kotlin</source>
+                                <source>${project.basedir}/src/main/kotlin</source>
                             </sourceDirs>
                         </configuration>
                     </execution>
@@ -149,9 +161,9 @@
                         </goals>
                         <configuration>
                             <sourceDirs>
-                                <source>src/test/java</source>
-                                <source>src/test/kotlin</source>
-                                <source>src/test/resources</source>
+                                <source>${project.basedir}/src/test/java</source>
+                                <source>${project.basedir}/src/test/kotlin</source>
+                                <source>${project.basedir}/src/test/resources</source>
                             </sourceDirs>
                         </configuration>
                     </execution>
@@ -163,13 +175,13 @@
                         </goals>
                         <configuration>
                             <sourceDirs>
-                                <source>src/test/kotlin</source>
+                                <source>${project.basedir}/src/test/kotlin</source>
                             </sourceDirs>
                             <annotationProcessorPaths>
                                 <annotationProcessorPath>
                                     <groupId>org.springframework.boot</groupId>
                                     <artifactId>spring-boot-configuration-processor</artifactId>
-                                    <version>2.7.0</version>
+                                    <version>${spring-boot.version}</version>
                                 </annotationProcessorPath>
                             </annotationProcessorPaths>
                         </configuration>
@@ -211,9 +223,6 @@
                 </executions>
             </plugin>
         </plugins>
-
-        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
     </build>
 
 </project>
