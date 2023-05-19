@@ -1,0 +1,30 @@
+# Exclude build and development artifacts
+node_modules/
+target/
+build/
+dist/
+*.log
+
+# Exclude version control directories
+.git/
+.svn/
+
+# Exclude editor and IDE files
+.vscode/
+.idea/
+
+# Exclude temporary and cache files
+*.tmp
+*.swp
+*.bak
+*.cache
+
+# Exclude test and documentation files
+*.test
+*.tests
+*.spec
+docs/
+
+# Exclude project-specific files and directories
+config/
+secrets/
