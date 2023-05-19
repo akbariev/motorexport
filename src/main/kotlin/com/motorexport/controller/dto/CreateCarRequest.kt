@@ -28,6 +28,7 @@ data class CreateCarRequest(
     @Size(max = 3, message = "{validation.name.size.too_long}")
     val country: String,
     val secretKey: String?,
+    //todo добавить hp
 )
 
 

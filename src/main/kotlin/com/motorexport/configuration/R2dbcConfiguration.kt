@@ -1,3 +1,5 @@
+package com.motorexport.configuration
+
 import com.motorexport.controller.dto.BodyTypeGroup
 import com.motorexport.controller.dto.EngineGroup
 import com.motorexport.controller.dto.GearType
@@ -13,7 +15,6 @@ import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
 import java.lang.reflect.ParameterizedType
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcProperties
-import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration
@@ -41,11 +42,13 @@ class R2dbcConfiguration(private val r2dbcProperties: R2dbcProperties) : Abstrac
     * spring.r2dbc.pool.max-size = 5
     * spring.r2dbc.pool.initial-size = 3
     * */
+/*
     @Bean
     @ConfigurationProperties("spring.r2dbc")
     fun r2dbcProperties(): R2dbcProperties {
         return R2dbcProperties()
     }
+*/
 
 
     /*
@@ -60,7 +63,7 @@ class R2dbcConfiguration(private val r2dbcProperties: R2dbcProperties) : Abstrac
         val connectionFactoryOptions = ConnectionFactoryOptions
             .parse(r2dbcProperties.url)
             .mutate()
-            .option(ConnectionFactoryOptions.USER, r2dbcProperties.name)
+            .option(ConnectionFactoryOptions.USER, r2dbcProperties.username)
             .option(ConnectionFactoryOptions.PASSWORD, r2dbcProperties.password)
             .build()
 
