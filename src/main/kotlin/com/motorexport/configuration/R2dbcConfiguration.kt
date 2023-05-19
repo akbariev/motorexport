@@ -1,5 +1,3 @@
-package com.motorexport.configuration
-
 import com.motorexport.controller.dto.BodyTypeGroup
 import com.motorexport.controller.dto.EngineGroup
 import com.motorexport.controller.dto.GearType
@@ -43,6 +41,12 @@ class R2dbcConfiguration(private val r2dbcProperties: R2dbcProperties) : Abstrac
     * spring.r2dbc.pool.max-size = 5
     * spring.r2dbc.pool.initial-size = 3
     * */
+    @Bean
+    @ConfigurationProperties("spring.r2dbc")
+    fun r2dbcProperties(): R2dbcProperties {
+        return R2dbcProperties()
+    }
+
 
     /*
     * Создаем бин, что будет хранить наши соединения к базе данных - ConnectionPool()
@@ -56,7 +60,7 @@ class R2dbcConfiguration(private val r2dbcProperties: R2dbcProperties) : Abstrac
         val connectionFactoryOptions = ConnectionFactoryOptions
             .parse(r2dbcProperties.url)
             .mutate()
-            .option(ConnectionFactoryOptions.USER, r2dbcProperties.username)
+            .option(ConnectionFactoryOptions.USER, r2dbcProperties.name)
             .option(ConnectionFactoryOptions.PASSWORD, r2dbcProperties.password)
             .build()
 
