@@ -52,6 +52,8 @@ interface CarRepository : CoroutineCrudRepository<CarEntity, UUID> {
         AND (:#{#car.priceTo} IS NULL OR c.price <= :#{#car.priceTo})
         AND (:#{#car.mileageFrom} IS NULL OR c.mileage >= :#{#car.mileageFrom})
         AND (:#{#car.mileageTo} IS NULL OR c.mileage <= :#{#car.mileageTo})
+        AND (:#{#car.make} IS NULL OR c.make = :#{#car.make})
+        AND (:#{model} IS NULL OR c.model = :#{#car.model})
         AND (:#{#car.displacementFrom} IS NULL OR c.displacement >= :#{#car.displacementFrom})
         AND (:#{#car.displacementTo} IS NULL OR c.displacement <= :#{#car.displacementTo})
         """

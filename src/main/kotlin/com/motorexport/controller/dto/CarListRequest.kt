@@ -29,6 +29,8 @@ data class CarListRequest(
     val mileageTo: Long? = null,
     val displacementFrom: Long? = null,
     val displacementTo: Long? = null,
+    val make: String? = null,
+    val model: String? = null,
     @field:PositiveOrZero
     val page: Int,
     @field:Positive
