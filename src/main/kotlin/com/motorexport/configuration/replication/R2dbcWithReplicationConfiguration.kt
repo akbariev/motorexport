@@ -1,4 +1,4 @@
-package com.motorexport.configuration
+package com.motorexport.configuration.replication
 
 import com.motorexport.controller.dto.BodyTypeGroup
 import com.motorexport.controller.dto.EngineGroup
@@ -15,15 +15,16 @@ import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
 import java.lang.reflect.ParameterizedType
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcProperties
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration
 import org.springframework.data.r2dbc.convert.EnumWriteSupport
 import org.springframework.data.r2dbc.convert.R2dbcCustomConversions
 import org.springframework.data.r2dbc.dialect.DialectResolver
 
-@Configuration
-class R2dbcConfiguration(private val r2dbcProperties: R2dbcProperties) : AbstractR2dbcConfiguration() {
+/*@Configuration*/
+class R2dbcWithReplicationConfiguration : AbstractR2dbcConfiguration() {
+
 
     val r2dbcEnums = listOf(
         r2dbcEnum<EngineGroup>("engine_group"),
@@ -34,7 +35,6 @@ class R2dbcConfiguration(private val r2dbcProperties: R2dbcProperties) : Abstrac
     )
 
     private inline fun <reified E : Enum<E>> r2dbcEnum(enumType: String) = object : R2dbcEnumConvertor<E>(enumType) {}
-
     abstract class R2dbcEnumConvertor<E : Enum<E>>(val enumType: String) : EnumWriteSupport<E>()
 
     @Bean
@@ -43,13 +43,21 @@ class R2dbcConfiguration(private val r2dbcProperties: R2dbcProperties) : Abstrac
     }
 
     @Bean
-    override fun connectionFactory(): ConnectionFactory {
+    @ConfigurationProperties("spring.r2dbc.master")
+    fun masterR2dbcProperties() = R2dbcProperties()
+
+    @Bean
+    @ConfigurationProperties("spring.r2dbc.replica")
+    fun replicaR2dbcProperties() = R2dbcProperties()
+
+    fun replicationConnectionPool(r2dbcProperties: R2dbcProperties): ConnectionPool {
         val connectionFactoryOptions = ConnectionFactoryOptions
             .parse(r2dbcProperties.url)
             .mutate()
             .option(ConnectionFactoryOptions.USER, r2dbcProperties.username)
             .option(ConnectionFactoryOptions.PASSWORD, r2dbcProperties.password)
             .build()
+
 
         val connectionConfiguration: PostgresqlConnectionConfiguration = PostgresqlConnectionFactoryProvider
             .builder(connectionFactoryOptions)
@@ -65,6 +73,7 @@ class R2dbcConfiguration(private val r2dbcProperties: R2dbcProperties) : Abstrac
                     codecRegistrar(enumCodecBuilder.build())
                 }
             }.build()
+
         val connectionPoolConfiguration =
             ConnectionPoolConfiguration.builder(PostgresqlConnectionFactory(connectionConfiguration))
         r2dbcProperties.pool.maxIdleTime?.let { connectionPoolConfiguration.maxIdleTime(it) }
@@ -77,4 +86,35 @@ class R2dbcConfiguration(private val r2dbcProperties: R2dbcProperties) : Abstrac
         r2dbcProperties.pool.validationDepth?.let { connectionPoolConfiguration.validationDepth(it) }
         return ConnectionPool(connectionPoolConfiguration.build())
     }
+
+    @Bean(destroyMethod = "dispose")
+    fun masterConnectionPool() = replicationConnectionPool(masterR2dbcProperties())
+
+    @Bean(destroyMethod = "dispose")
+    fun replicaConnectionPool() = replicationConnectionPool(replicaR2dbcProperties())
+
+    @Bean
+    override fun connectionFactory(): ConnectionFactory {
+        val masterConnectionPool = masterConnectionPool()
+        val replicaConnectionPool = replicaConnectionPool()
+
+        val routingConnectionFactory = R2dbcRoutingConnectionFactory()
+        routingConnectionFactory.setTargetConnectionFactories(
+            mapOf(
+                DATABASE.MASTER to masterConnectionPool,
+                DATABASE.REPLICA to replicaConnectionPool,
+
+                )
+        )
+        routingConnectionFactory.setDefaultTargetConnectionFactory(masterConnectionPool)
+        return routingConnectionFactory
+    }
+
+    @Bean
+    fun r2dbcRoutingTransactionManager() = R2dbcRoutingTransactionManager(connectionFactory())
+}
+
+const val READ_ONLY_TX_KEY = "READ_ONLY_TX_KEY"
+enum class DATABASE {
+    MASTER, REPLICA
 }

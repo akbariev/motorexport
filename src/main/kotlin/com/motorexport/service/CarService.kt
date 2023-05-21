@@ -36,6 +36,7 @@ class CarService(
         const val IMAGE_FOLDER_PATH = "images/" //creates folder on src level
     }
 
+    @Transactional(readOnly = true)
     suspend fun getCar(id: String): CarModel? {
         return carRepository.findById(UUID.fromString(id))?.let {
             it.id ?: error("not car id present")
@@ -63,10 +64,11 @@ class CarService(
         }
     }
 
+    @Transactional(readOnly = true)
     suspend fun getCars(carRequest: CarListRequest): CarsResponse {
-        val cars =  carRepository.findAllByFilter(carRequest)
+        val cars = carRepository.findAllByFilter(carRequest)
         val carsSize = carRepository.countAllByFilter(carRequest)
-        val totalPages = if(carsSize > 0) ceil(carsSize / carRequest.size.toDouble()).toLong() else 0
+        val totalPages = if (carsSize > 0) ceil(carsSize / carRequest.size.toDouble()).toLong() else 0
         return CarsResponse(cars, totalPages)
     }
 
@@ -115,20 +117,20 @@ class CarService(
     @Transactional
     suspend fun updateCar(request: UpdateCarRequest, images: Flux<FilePart>?): UUID {
         if (request.secretKey != "export2023") error("Incorrect secret")
-        val carEntity = carRepository.findById(request.carId)?: error("no car present by id ${request.carId}")
+        val carEntity = carRepository.findById(request.carId) ?: error("no car present by id ${request.carId}")
         val updatedCarEntity = carEntity.copy(
-            engineGroup = request.engineGroup?: carEntity.engineGroup,
-                    gearType = request.gearType?: carEntity.gearType,
-                    transmission = request.transmission?: carEntity.transmission,
-                    bodyTypeGroup = request.bodyTypeGroup?: carEntity.bodyTypeGroup,
-                    inStock = request.inStock?: carEntity.inStock,
-                    year = request.year?: carEntity.year,
-                    price = request.price?.toBigDecimal()?: carEntity.price,
-                    mileage = request.mileage?: carEntity.mileage,
-                    displacement = request.displacement?: carEntity.displacement,
-                    country = request.country?: carEntity.country,
-                    make = request.make?: carEntity.make,
-                    model = request.model?: carEntity.model,
+            engineGroup = request.engineGroup ?: carEntity.engineGroup,
+            gearType = request.gearType ?: carEntity.gearType,
+            transmission = request.transmission ?: carEntity.transmission,
+            bodyTypeGroup = request.bodyTypeGroup ?: carEntity.bodyTypeGroup,
+            inStock = request.inStock ?: carEntity.inStock,
+            year = request.year ?: carEntity.year,
+            price = request.price?.toBigDecimal() ?: carEntity.price,
+            mileage = request.mileage ?: carEntity.mileage,
+            displacement = request.displacement ?: carEntity.displacement,
+            country = request.country ?: carEntity.country,
+            make = request.make ?: carEntity.make,
+            model = request.model ?: carEntity.model,
         )
 
         val carId = carRepository.save(updatedCarEntity).id ?: error("no car id present")
@@ -137,12 +139,14 @@ class CarService(
 
         val finalCarImagePathsToBeDeleted = mutableListOf<String>()
         request.carImagePathsToBeDeleted.forEach {
-            if(carImageIdsByEntities.contains(it)) {
+            if (carImageIdsByEntities.contains(it)) {
                 finalCarImagePathsToBeDeleted.add(it)
             }
         }
-        finalCarImagePathsToBeDeleted.takeIf { it.size > 0 }?.let { carImagesRepository.deleteAllByPathIn(finalCarImagePathsToBeDeleted) }
-        val allowedMaxCarImagesSize = MAX_ALLOWED_IMAGES_SIZE - (carImageIdsByEntities.size - finalCarImagePathsToBeDeleted.size)
+        finalCarImagePathsToBeDeleted.takeIf { it.size > 0 }
+            ?.let { carImagesRepository.deleteAllByPathIn(finalCarImagePathsToBeDeleted) }
+        val allowedMaxCarImagesSize =
+            MAX_ALLOWED_IMAGES_SIZE - (carImageIdsByEntities.size - finalCarImagePathsToBeDeleted.size)
 
         // и сверяем с новым числом картинок, берем то количество картинок, чтобы в сумме не привышало 5 картинок.
 

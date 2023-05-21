@@ -27,3 +27,73 @@ spring:
     password: ${db.password}
     user: postgres
 
+
+# REPLICATION
+#db:
+#  master:
+#    url: postgresql://127.0.0.1:5434/postgres?prepareThreshold=0
+#    username: postgres
+#    password: postgres
+#  replica:
+#    url: postgresql://127.0.0.1:5433/postgres?prepareThreshold=0
+#    username: postgres
+#    password: postgres
+#
+#
+#spring:
+#  # Image configuration
+#  servlet:
+#    multipart:
+#      max-file-size: 5MB
+#      max-request-size: 5MB
+#      enabled: true
+#  # Database configuration
+#  r2dbc:
+#    master:
+#      url: "r2dbc:${db.master.url}"
+#      username: ${db.master.username}
+#      password: ${db.master.password}
+#      pool:
+#        initial-size: 4
+#        max-size: 5
+#    replica:
+#      url: "r2dbc:${db.replica.url}"
+#      username: ${db.replica.username}
+#      password: ${db.replica.password}
+#      pool:
+#        initial-size: 4
+#        max-size: 5
+#  # Flyway configuration
+#  flyway:
+#    enabled: true
+#    locations: classpath:db/migration
+#    schemas: public
+#    url: "jdbc:${db.master.url}"
+#    username: ${db.master.username}
+#    password: ${db.master.password}
+#    user: postgres
+
+
+
+
+# SHARDS
+# db-configuration - dev #for another .yaml here can be other configurations
+
+#shards:
+#  hosts:
+#    - 127.0.0.1
+#    - 127.0.0.1
+#  ports:
+#    - 5433
+#    - 5434
+#  dbNames:
+#    - postgres
+#    - postgres
+#  userNames:
+#    - postgres
+#    - postgres
+#  passwords:
+#    - postgres
+#    - postgres
+#
+#db-configuration:  master_yaml
