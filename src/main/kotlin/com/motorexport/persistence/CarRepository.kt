@@ -32,7 +32,7 @@ interface CarRepository : CoroutineCrudRepository<CarEntity, UUID> {
         AND (:#{#car.displacementFrom} IS NULL OR c.displacement >= :#{#car.displacementFrom})
         AND (:#{#car.displacementTo} IS NULL OR c.displacement <= :#{#car.displacementTo})
         GROUP BY c.id
-        OFFSET :#{#car.page}
+        OFFSET (:#{#car.size} * (:#{#car.page} + 1)) - :#{#car.size}
         LIMIT :#{#car.size}
         """
     )
