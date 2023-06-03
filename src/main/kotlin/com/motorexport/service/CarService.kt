@@ -96,7 +96,7 @@ class CarService(
         images.map { filePart ->
             val imageId = UUID.randomUUID()
             val carImagesFolder = IMAGE_FOLDER_PATH + carId
-            val imagePath = carImagesFolder + "/" + imageId.toString() + filePart.filename()
+            val imagePath = "$carImagesFolder/$imageId.jpg"
             val file = Paths.get(imagePath)
 
             // Write the file to disk
@@ -155,7 +155,7 @@ class CarService(
         // Collect the files and save them to the directory
         images?.take(allowedMaxCarImagesSize.toLong())?.map { filePart ->
             val imageId = UUID.randomUUID()
-            val imagePath = IMAGE_FOLDER_PATH + imageId.toString() + filePart.filename()
+            val imagePath = "$IMAGE_FOLDER_PATH/$imageId.jpeg"
             val file = Paths.get(imagePath)
 
             // Write the file to disk

@@ -1,6 +1,6 @@
 db:
-#  url: postgresql://postgredb:5432/postgres
-  url: postgresql://127.0.0.1:5433/postgres
+  url: postgresql://postgredb:5432/postgres
+#  url: postgresql://127.0.0.1:5433/postgres
   username: postgres
   password: postgres
 
