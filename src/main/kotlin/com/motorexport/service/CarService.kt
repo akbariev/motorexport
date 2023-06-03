@@ -12,6 +12,7 @@ import com.motorexport.persistence.entity.CarsResponse
 import java.math.BigDecimal
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.attribute.PosixFilePermission
 import java.util.UUID
 import kotlin.math.ceil
 import kotlinx.coroutines.Dispatchers
@@ -104,6 +105,8 @@ class CarService(
                 withContext(Dispatchers.IO) {
                     Files.createDirectories(Paths.get(carImagesFolder))
                     filePart.transferTo(file).awaitFirstOrNull()
+                    // Set file permissions to allow reading
+                    Files.setPosixFilePermissions(file, setOf(PosixFilePermission.OTHERS_READ))
                 }
             }
             carImagesItems.add(CarImageEntity(id = imageId, path = imagePath, carId = carId))
