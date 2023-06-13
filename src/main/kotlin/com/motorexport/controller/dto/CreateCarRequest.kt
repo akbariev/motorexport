@@ -27,6 +27,8 @@ data class CreateCarRequest(
     @Size(min = 2, message = "{validation.name.size.too_short}")
     @Size(max = 3, message = "{validation.name.size.too_long}")
     val country: String,
+    @Deprecated("create manager table")
+    val managerPhoneNumber: String,
     val secretKey: String?,
     //todo добавить hp
 )

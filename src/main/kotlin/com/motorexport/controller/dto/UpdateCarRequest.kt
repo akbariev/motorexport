@@ -23,6 +23,8 @@ data class UpdateCarRequest(
     val displacement: Int? = null,
     @field:Max(3)
     val country: String? = null,
+    @Deprecated("create manager table")
+    val managerPhoneNumber: String? = null,
     val secretKey: String,
     val carImagePathsToBeDeleted: List<String> = listOf(),
 )

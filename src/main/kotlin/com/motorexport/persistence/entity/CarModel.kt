@@ -23,6 +23,8 @@ data class CarModel(
     val mileage: Long,
     val displacement: Int,
     val country: String,
+    @Deprecated("create manager table")
+    val managerPhoneNumber: String,
     val imagePaths: List<String>? = null,
     val createdAt: Instant = Instant.now(),
     val updatedAt: Instant = Instant.now(),

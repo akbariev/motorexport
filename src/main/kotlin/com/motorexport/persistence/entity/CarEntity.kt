@@ -29,6 +29,8 @@ data class CarEntity(
     val country: String,
     val make: String,
     val model: String,
+    @Deprecated("create manager table")
+    val managerPhoneNumber: String,
     @CreatedDate
     val createdAt: Instant = Instant.now(),
     @LastModifiedDate

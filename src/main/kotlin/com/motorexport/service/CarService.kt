@@ -59,6 +59,7 @@ class CarService(
                 imagePaths = images,
                 make = it.make,
                 model = it.model,
+                managerPhoneNumber = it.managerPhoneNumber,
                 createdAt = it.createdAt,
                 updatedAt = it.updatedAt,
             )
@@ -89,6 +90,7 @@ class CarService(
             country = request.country,
             make = request.make,
             model = request.model,
+            managerPhoneNumber = request.managerPhoneNumber,
         )
         val carId = carRepository.save(entity).id ?: error("no car id present")
 
@@ -134,6 +136,7 @@ class CarService(
             country = request.country ?: carEntity.country,
             make = request.make ?: carEntity.make,
             model = request.model ?: carEntity.model,
+            managerPhoneNumber = request.managerPhoneNumber ?: carEntity.managerPhoneNumber,
         )
 
         val carId = carRepository.save(updatedCarEntity).id ?: error("no car id present")
